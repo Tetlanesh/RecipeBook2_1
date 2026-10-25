@@ -1,14 +1,14 @@
 {
   "name": "RecipeBook2_1",
   "version": "1.0.0",
-  "title": "Recipe Book 2.1",
+  "title": "Recipe Book for 2.1",
   "description": "A Factorio 2.1 fork of Recipe Book, based on the work of raiguard and updated by Project Cybersyn contributors.",
   "author": "Project Cybersyn contributors",
   "factorio_version": "2.1",
   "dependencies": [ "base >= 2.1.20", "flib >= 0.17.2" ],
   "package": {
     "git_publish_branch": "trunk",
-    "ignore": [ "crowdin.yml", "justfile", "README.md", "resources/*", "screenshots/*" ],
+    "ignore": [ "justfile", "README.md", "resources/*", "screenshots/*" ],
     "sync_portal_details": true
   }
 }

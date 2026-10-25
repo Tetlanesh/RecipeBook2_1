@@ -1,12 +1,13 @@
 [![Factorio](https://img.shields.io/badge/Factorio-2.1-orange)](https://www.factorio.com/)
 
-# Recipe Book 2.1
+# Recipe Book for 2.1
 
-Recipe Book 2.1 is a Factorio 2.1 fork of [Recipe Book by raiguard](https://codeberg.org/raiguard/RecipeBook). It is based on upstream version 4.0.10 and includes compatibility changes maintained by Project Cybersyn contributors.
+Recipe Book for 2.1 is a Factorio 2.1 fork of [Recipe Book by raiguard](https://codeberg.org/raiguard/RecipeBook).
 
-It is a compendium of information about recipes, materials, and machines, with advanced filtering options. It is similar to the Factoriopedia, but includes advanced filtering options and mod settings to customize your workflow. It is particularly beneficial in large modpacks such as Pyanodons.
 
-This fork uses its own mod identifier, `RecipeBook2_1`, and is intended for Factorio 2.1. Its remote interface remains named `RecipeBook` for compatibility with mods that integrate with Recipe Book.
+# Original mod description
+
+Recipe Book is a compendium of information about recipes, materials, and machines, with advanced filtering options. It is similar to the Factoriopedia, but includes advanced filtering options and mod settings to customize your workflow. It is particularly beneficial in large modpacks such as Pyanodons.
 
 It is recommended that you disable "Open Factoriopedia" in the controls menu so that alt+click will open things in Recipe Book instead.
 
@@ -16,7 +17,7 @@ This mod includes a remote interface that allows other mods to open an info page
 
 ## Download
 
-Once published, this fork will be available on the Factorio mod portal under `RecipeBook2_1`.
+Download on the [Factorio mod portal](https://mods.factorio.com/mod/RecipeBook2_1), either on the website or in-game.
 
 ## License and credits
 
