@@ -3,3 +3,4 @@ imgui.ini
 .luarc.json
 pesticide.json
 .vscode
+*.zip
