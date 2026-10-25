@@ -1,0 +1,303 @@
+local flib_format = require("__flib__.format")
+local flib_math = require("__flib__.math")
+local core_util = require("__core__.lualib.util")
+local util = require("scripts.util")
+
+--- @class GuiUtil
+local gui_util = {}
+
+--- @param crafting_time double?
+--- @return LocalisedString?
+function gui_util.format_crafting_time(crafting_time)
+  if not crafting_time then
+    return nil
+  end
+  return {
+    "",
+    "[img=quantity-time]",
+    gui_util.format_time(crafting_time),
+    " ",
+    { "description.crafting-time" },
+  }
+end
+
+--- @param count uint?
+--- @param time double?
+--- @return LocalisedString
+function gui_util.format_technology_count_and_time(count, time)
+  if not count or not time then
+    return
+  end
+
+  --- @type LocalisedString
+  return {
+    "",
+    "[img=quantity-time]",
+    { "time-symbol-seconds", flib_math.floored(time, 0.01) },
+    " × ",
+    flib_format.number(count, true),
+  }
+end
+
+local temperature_edge = (2 - 2 ^ -23) * 2 ^ 127
+
+--- @param id DatabaseID
+--- @return LocalisedString
+function gui_util.format_caption(id)
+  --- @type LocalisedString
+  local caption = { "" }
+  if id.probability and id.probability < 1 then
+    caption[#caption + 1] = {
+      "",
+      "[font=default-semibold]",
+      { "format-percent", flib_math.round(id.probability * 100, 0.01) },
+      "[/font] ",
+    }
+  end
+  if id.amount then
+    if id.extra_count_fraction then
+      caption[#caption + 1] = {
+        "",
+        "[font=default-semibold]",
+        core_util.format_number(flib_math.round(id.amount, 0.01), true),
+        "-",
+        core_util.format_number(flib_math.round(id.amount + 1, 0.01), true),
+        " ×[/font] ",
+      }
+    else
+      caption[#caption + 1] = {
+        "",
+        "[font=default-semibold]",
+        core_util.format_number(flib_math.round(id.amount, 0.01), true),
+        " ×[/font] ",
+      }
+    end
+  elseif id.amount_min and id.amount_max then
+    caption[#caption + 1] = {
+      "",
+      "[font=default-semibold]",
+      core_util.format_number(flib_math.round(id.amount_min, 0.01), true),
+      "-",
+      core_util.format_number(flib_math.round(id.amount_max, 0.01), true),
+      " ×[/font] ",
+    }
+  end
+  if id.time then
+    caption[#caption + 1] = {
+      "",
+      "[font=default-semibold](",
+      gui_util.format_time(id.time),
+      ")[/font] ",
+    }
+  end
+
+  caption[#caption + 1] = util.get_prototype(id).localised_name --- @diagnostic disable-line:assign-type-mismatch
+
+  if id.temperature then
+    caption[#caption + 1] = { "", "  (", flib_math.round(id.temperature, 0.01), { "si-unit-degree-celsius" }, ")" }
+  elseif id.minimum_temperature and id.maximum_temperature then
+    local temperature_min = id.minimum_temperature --[[@as number]]
+    local temperature_max = id.maximum_temperature --[[@as number]]
+    local temperature_string
+    if temperature_min == -temperature_edge then
+      temperature_string = "≤ " .. flib_math.round(temperature_max, 0.01)
+    elseif temperature_max == temperature_edge then
+      temperature_string = "≥ " .. flib_math.round(temperature_min, 0.01)
+    else
+      temperature_string = ""
+        .. flib_math.round(temperature_min, 0.01)
+        .. " - "
+        .. flib_math.round(temperature_max, 0.01)
+    end
+    caption[#caption + 1] = { "", "  (", temperature_string, { "si-unit-degree-celsius" }, ")" }
+  end
+
+  if id.extra_count_fraction then
+    caption[#caption + 1] = " [img=info]"
+  end
+
+  return caption
+end
+
+--- @param id DatabaseID
+function gui_util.format_tooltip(id)
+  --- @type LocalisedString
+  local output = { "" }
+  if id.extra_count_fraction then
+    output[#output + 1] = {
+      "",
+      {
+        "description.extra-count-factor",
+        core_util.format_number(flib_math.round(id.extra_count_fraction * 100, 0.01)),
+      },
+      "\n",
+    }
+  end
+  output[#output + 1] = { "", { "gui.rb-control-hint" }, "\n", { "gui.rb-pipette-control-hint" } }
+  return output
+end
+
+--- @param input number?
+--- @return LocalisedString?
+function gui_util.format_short_number(input)
+  if not input then
+    return
+  end
+  local divisor = 0.1
+  if input >= 100 then
+    divisor = 1
+  elseif input < 1 then
+    divisor = 0.01
+  end
+
+  return core_util.format_number(flib_math.floored(input, divisor), true)
+end
+
+--- @param input number Time in seconds.
+--- @return LocalisedString
+function gui_util.format_time(input)
+  local output = input
+  local format = "time-symbol-seconds"
+  if input >= 60 * 60 then
+    output = input / 60 / 60
+    format = "time-symbol-hours"
+  elseif input >= 60 then
+    output = input / 60
+    format = "time-symbol-minutes"
+  end
+
+  return { format, gui_util.format_short_number(output) }
+end
+
+--- @param id DatabaseID
+--- @return LocalisedString? bottom
+--- @return LocalisedString? top
+function gui_util.format_slot_button_remarks(id)
+  local amount = id.amount
+  local amount_min = id.amount_min
+  local amount_max = id.amount_max
+  if amount then
+    return gui_util.format_short_number(amount)
+  elseif amount_min and amount_max and amount_min ~= amount_max then
+    return gui_util.format_short_number(amount_min), gui_util.format_short_number(amount_max)
+  elseif amount_min then
+    return gui_util.format_short_number(amount_min)
+  elseif amount_max then
+    return gui_util.format_short_number(amount_max)
+  end
+  if id.time then
+    return gui_util.format_time(id.time)
+  end
+  local temperature = id.temperature
+  local temperature_min = id.minimum_temperature
+  local temperature_max = id.maximum_temperature
+  --- @type LocalisedString?
+  local bottom
+  --- @type LocalisedString?
+  local top
+  if temperature then
+    bottom = { "", gui_util.format_short_number(temperature), { "si-unit-degree-celsius" } }
+  elseif temperature_min and temperature_max then
+    if temperature_min == -temperature_edge then
+      bottom = { "", "≤", gui_util.format_short_number(temperature_max), { "si-unit-degree-celsius" } }
+    elseif temperature_max == temperature_edge then
+      bottom = { "", "≥", gui_util.format_short_number(temperature_min), { "si-unit-degree-celsius" } }
+    else
+      bottom = { "", gui_util.format_short_number(temperature_min), { "si-unit-degree-celsius" } }
+      top = { "", gui_util.format_short_number(temperature_max), { "si-unit-degree-celsius" } }
+    end
+  end
+
+  return bottom, top
+end
+
+--- @alias FabState
+--- | "default"
+--- | "selected"
+--- | "disabled"
+
+--- @param button LuaGuiElement
+--- @param state FabState
+function gui_util.update_frame_action_button(button, state)
+  if state == "default" then
+    button.enabled = true
+    button.toggled = false
+  elseif state == "selected" then
+    button.enabled = true
+    button.toggled = true
+  elseif state == "disabled" then
+    button.enabled = false
+    button.toggled = false
+  end
+end
+
+--- @type table<string, LocalisedString>
+gui_util.type_locale = {
+  LuaEntityPrototype = { "factoriopedia.entity" },
+  LuaEquipmentPrototype = { "gui-map-editor.character-equipment" },
+  LuaFluidPrototype = { "factoriopedia.fluid" },
+  LuaItemPrototype = { "factoriopedia.item" },
+  LuaRecipePrototype = { "description.recipe" },
+  LuaTechnologyPrototype = { "gui-map-generator.technology-difficulty-group-tile" },
+  LuaTilePrototype = { "factoriopedia.tile" },
+}
+
+--- @type table<string, boolean>
+gui_util.vehicles = {
+  ["car"] = true,
+  ["artillery-wagon"] = true,
+  ["cargo-wagon"] = true,
+  ["fluid-wagon"] = true,
+  ["locomotive"] = true,
+  ["spider-vehicle"] = true,
+}
+
+--- @return LocalisedString
+function gui_util.format_power(input)
+  local formatted = flib_format.number(input, true)
+  if input < 1000 then
+    return { "", formatted, " ", { "si-unit-symbol-watt" } }
+  end
+  return { "", formatted, { "si-unit-symbol-watt" } }
+end
+
+--- @param id DatabaseID
+--- @param fallback string
+function gui_util.get_tooltip_category_sprite(id, fallback)
+  local by_name = "tooltip-category-" .. id.name
+  if helpers.is_valid_sprite_path(by_name) then
+    return by_name
+  end
+  return "tooltip-category-" .. fallback
+end
+
+--- @param elem LuaGuiElement
+--- @param key string
+--- @param value AnyBasic
+function gui_util.add_tag(elem, key, value)
+  local tags = elem.tags
+  tags[key] = value
+  elem.tags = tags
+end
+
+--- @param tick uint
+--- @return string
+function gui_util.format_spoil_time(tick)
+  local total_seconds = math.floor(tick / 60)
+  local seconds = total_seconds % 60
+  local minutes = math.floor(total_seconds / 60 % 60)
+  local hours = math.floor(total_seconds / 60 / 60)
+  local output = ""
+  if hours > 0 then
+    output = output .. hours .. "h"
+  end
+  if minutes > 0 then
+    output = output .. minutes .. "m"
+  end
+  if seconds > 0 then
+    output = output .. seconds .. "s"
+  end
+  return output
+end
+
+return gui_util
