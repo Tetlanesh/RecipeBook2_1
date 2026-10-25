@@ -4,6 +4,17 @@
 
 Recipe Book for 2.1 is a Factorio 2.1 fork of [Recipe Book by raiguard](https://codeberg.org/raiguard/RecipeBook).
 
+I will try to fix any issues for foreseeable time, but with small exceptions I do not plan to make any changes to the mod like adding new features or changing behaviors.
+
+Please post any bug reports as issues on the [github issues page](https://github.com/Tetlanesh/RecipeBook2_1/issues).
+
+You can also contact me in [Project Cybersyn discord](https://discord.gg/AyBvWUGRF)
+
+## License and credits
+
+The mod's source code is distributed under the MIT License. Keep the included [LICENSE](LICENSE) and its notices when redistributing. Third-party icon assets have their own attribution and license notices in that file.
+
+Original mod was created by [raiguard](https://mods.factorio.com/user/raiguard) - all thanks goes to him, I just vibe-coded things to make it work with 2.1.
 
 # Original mod description
 
@@ -18,10 +29,6 @@ This mod includes a remote interface that allows other mods to open an info page
 ## Download
 
 Download on the [Factorio mod portal](https://mods.factorio.com/mod/RecipeBook2_1), either on the website or in-game.
-
-## License and credits
-
-The mod's source code is distributed under the MIT License. Keep the included [LICENSE](LICENSE) and its notices when redistributing. Third-party icon assets have their own attribution and license notices in that file.
 
 ## Screenshots
 
